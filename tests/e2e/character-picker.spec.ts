@@ -27,7 +27,7 @@ test.describe("character picker", () => {
 
   test("renders the lean intro and compact stepper", async ({ page }) => {
     await expect(
-      page.getByRole("heading", { name: "Rescue One-Shot Character Picker" })
+      page.getByRole("heading", { name: "D&D Character Picker" })
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Checklist" })).toBeVisible();
     await expect(

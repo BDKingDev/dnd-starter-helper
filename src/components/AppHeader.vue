@@ -16,7 +16,7 @@ const emit = defineEmits<{
   <header class="app-header">
     <div class="app-header__topline">
       <div>
-        <p class="app-header__eyebrow">Beginner-friendly one-shot</p>
+        <p class="app-header__eyebrow">Beginner-friendly Character Creation</p>
         <h1>{{ title }}</h1>
         <p class="app-header__subtitle">{{ subtitle }}</p>
       </div>

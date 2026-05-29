@@ -1,7 +1,7 @@
 import type { IntroContent } from "../types";
 
 export const introContent: IntroContent = {
-  title: "Rescue One-Shot Character Picker",
+  title: "D&D Character Picker",
   subtitle:
     "Make a few meaningful choices, get a character that already works, and show up ready to play.",
   playerDecisionFlow: [

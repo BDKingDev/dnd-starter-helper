@@ -1,21 +1,54 @@
+/* ===========================================================================
+   Refined Arcane Tome — dark, candlelit fantasy character builder
+   Token graph: OKLCH reference values -> semantic roles -> components.
+   Two-accent discipline (gold + ember), low chroma, 60-30-10.
+   =========================================================================== */
+
 :root {
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  color: #e8eef7;
-  background:
-    radial-gradient(circle at top, rgba(66, 123, 201, 0.16), transparent 35%),
-    linear-gradient(180deg, #0e1521 0%, #091018 100%);
+  font-family: "Archivo", "Segoe UI", system-ui, sans-serif;
+  font-optical-sizing: auto;
   color-scheme: dark;
-  --bg: #091018;
-  --panel: rgba(17, 24, 36, 0.88);
-  --panel-strong: rgba(22, 31, 45, 0.95);
-  --panel-soft: rgba(12, 18, 28, 0.78);
-  --border: rgba(125, 161, 212, 0.22);
-  --border-strong: rgba(125, 161, 212, 0.55);
-  --text: #e8eef7;
-  --muted: #aebdd2;
-  --accent: #88b4f3;
-  --accent-strong: #5f8fda;
-  --shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+
+  /* --- warm neutral surface ramp (hue ~70, very low chroma) --- */
+  --bg: oklch(0.17 0.012 70); /* page ink */
+  --panel: oklch(0.24 0.014 72 / 0.88); /* raised; slight transparency lets grain show */
+  --panel-strong: oklch(0.3 0.016 74 / 0.96);
+  --panel-soft: oklch(0.21 0.013 72 / 0.72);
+  --field: oklch(0.14 0.011 68 / 0.85);
+
+  /* --- text --- */
+  --text: oklch(0.93 0.022 85); /* parchment */
+  --muted: oklch(0.76 0.028 80); /* taupe */
+
+  /* --- accents (used sparingly) --- */
+  --accent: oklch(0.8 0.1 85); /* antique gold */
+  --accent-strong: oklch(0.87 0.115 88);
+  --action: oklch(0.58 0.15 45); /* ember */
+  --action-strong: oklch(0.66 0.165 47);
+  --on-action: oklch(0.95 0.02 85); /* cream text on ember */
+
+  /* --- semantic state --- */
+  --success: oklch(0.8 0.09 140); /* sage */
+  --danger: oklch(0.66 0.15 38); /* rust */
+
+  /* --- derived (no hand-picked extra hexes) --- */
+  --border: color-mix(in oklab, var(--accent) 18%, transparent);
+  --border-strong: color-mix(in oklab, var(--accent) 42%, transparent);
+  --hairline: color-mix(in oklab, var(--accent) 10%, transparent);
+  --ring: color-mix(in oklab, var(--accent) 32%, transparent);
+  --shadow: 0 18px 38px oklch(0 0 0 / 0.45);
+
+  color: var(--text);
+  background-color: oklch(0.15 0.011 66);
+  /* candlelit atmosphere: warm top glow + faint ember floor + ink gradient */
+  background-image:
+    radial-gradient(120% 78% at 50% -12%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 55%),
+    radial-gradient(100% 90% at 50% 118%, color-mix(in oklab, var(--action) 12%, transparent), transparent 60%),
+    linear-gradient(180deg, oklch(0.19 0.013 70) 0%, oklch(0.14 0.01 66) 100%);
+  background-attachment: fixed;
+
+  scrollbar-color: color-mix(in oklab, var(--accent) 38%, transparent) transparent;
+  scrollbar-width: thin;
 }
 
 * {
@@ -31,6 +64,19 @@ body,
 
 body {
   min-height: 100vh;
+  position: relative;
+}
+
+/* very faint paper grain, fixed behind content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 button,
@@ -43,14 +89,27 @@ button {
   cursor: pointer;
 }
 
+::selection {
+  background: color-mix(in oklab, var(--accent) 32%, transparent);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .app-shell {
   width: min(1640px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 2rem 0 3.5rem;
 }
 
+/* ---------------------------------------------------------------- header --- */
+
 .app-header {
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .app-header__topline {
@@ -60,54 +119,108 @@ button {
   align-items: flex-start;
 }
 
+/* eyebrows + small UI labels: condensed gold caps (Archivo Narrow) */
+.app-header__eyebrow,
+.intro-panel__eyebrow,
+.review-panel__eyebrow,
+.app-header__toggle-label,
+.progress-stepper__label,
+.summary-panel__list dt,
+.field-block span {
+  font-stretch: 80%;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
 .app-header__eyebrow,
 .intro-panel__eyebrow,
 .review-panel__eyebrow {
-  margin: 0 0 0.5rem;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.78rem;
+  margin: 0 0 0.55rem;
+  font-size: 0.74rem;
+}
+
+/* display headings: Archivo SemiExpanded */
+.app-header h1,
+.intro-panel h2,
+.review-panel h2,
+.save-result h2,
+.card-grid-section__header h2,
+.intro-block h3,
+.review-chip h3,
+.character-card__detail-copy h4,
+.selectable-card h3,
+.summary-panel__mobile summary {
+  font-stretch: 112%;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .app-header h1,
 .intro-panel h2,
 .review-panel h2 {
   margin: 0;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
 }
 
 .app-header h1 {
-  font-size: clamp(2.7rem, 4vw, 4.8rem);
-  max-width: 18ch;
+  font-size: clamp(2.5rem, 3.6vw, 4.3rem);
+  font-weight: 800;
+  max-width: 16ch;
+  color: var(--text);
 }
 
 .app-header__subtitle {
-  max-width: 72rem;
-  margin: 0.85rem 0 0;
+  max-width: 58rem;
+  margin: 0.9rem 0 0;
   color: var(--muted);
-  font-size: 1.08rem;
-  line-height: 1.55;
+  font-size: 1.06rem;
+  line-height: 1.6;
+}
+
+/* signature asterism divider under the header */
+.app-header::after {
+  content: "\2726";
+  display: block;
+  margin-top: 1.35rem;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--accent);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0,
+    color-mix(in oklab, var(--accent) 38%, transparent) 6%,
+    color-mix(in oklab, var(--accent) 38%, transparent) 45%,
+    transparent 47.5%,
+    transparent 52.5%,
+    color-mix(in oklab, var(--accent) 38%, transparent) 55%,
+    color-mix(in oklab, var(--accent) 38%, transparent) 94%,
+    transparent 100%
+  );
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .app-header__toggle-block {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.5rem;
   justify-items: end;
 }
 
 .app-header__toggle-label {
-  color: var(--muted);
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
 }
 
 .app-header__toggle {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
+
+/* ------------------------------------------------------------- stepper --- */
 
 .progress-stepper {
   display: grid;
@@ -121,35 +234,44 @@ button {
 .progress-stepper__item {
   padding: 0.7rem 0.8rem;
   border: 1px solid var(--border);
-  border-radius: 0.85rem;
-  background: rgba(14, 20, 31, 0.78);
+  border-radius: 0.55rem;
+  background: var(--panel-soft);
   display: flex;
-  gap: 0.55rem;
+  gap: 0.6rem;
   align-items: center;
 }
 
 .progress-stepper__item[data-state="current"] {
-  border-color: var(--border-strong);
-  background: linear-gradient(180deg, rgba(33, 44, 61, 0.98), rgba(19, 27, 39, 0.98));
+  border-color: color-mix(in oklab, var(--action) 60%, transparent);
+  background: color-mix(in oklab, var(--action) 13%, var(--panel));
 }
 
 .progress-stepper__item[data-state="done"] .progress-stepper__index {
   background: var(--accent);
-  color: #091018;
+  border-color: var(--accent);
+  color: oklch(0.2 0.03 70);
+}
+
+.progress-stepper__item[data-state="current"] .progress-stepper__index {
+  border-color: var(--action-strong);
+  color: var(--text);
 }
 
 .progress-stepper__index {
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border-radius: 999px;
   border: 1px solid var(--border-strong);
   display: grid;
   place-items: center;
-  font-size: 0.72rem;
+  font-stretch: 112%;
+  font-weight: 700;
+  font-size: 0.74rem;
+  color: var(--muted);
 }
 
 .progress-stepper__label {
-  font-size: 0.82rem;
+  font-size: 0.74rem;
   color: var(--muted);
 }
 
@@ -158,6 +280,8 @@ button {
   color: var(--text);
 }
 
+/* -------------------------------------------------------------- layout --- */
+
 .app-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.72fr) minmax(300px, 0.56fr);
@@ -165,6 +289,7 @@ button {
   align-items: start;
 }
 
+/* shared raised-surface plate with embossed hairline */
 .main-panel,
 .summary-panel__mobile,
 .intro-block,
@@ -173,9 +298,11 @@ button {
 .card-grid-section,
 .selectable-card {
   border: 1px solid var(--border);
-  border-radius: 1.35rem;
+  border-radius: 0.6rem;
   background: var(--panel);
-  box-shadow: var(--shadow);
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 var(--hairline);
 }
 
 .main-panel {
@@ -214,8 +341,14 @@ button {
   margin-bottom: 0;
 }
 
+.intro-block ol,
+.intro-block li,
+.character-card__detail-copy li {
+  line-height: 1.55;
+}
+
 .intro-block dt {
-  color: var(--accent);
+  color: var(--accent-strong);
   font-weight: 700;
 }
 
@@ -228,24 +361,51 @@ button {
   padding: 0 0.25rem;
   color: var(--muted);
   font-size: 1rem;
+  line-height: 1.6;
 }
+
+/* ---------------------------------------------------------- card grids --- */
 
 .card-grid-section {
   padding: 1.35rem;
 }
 
 .card-grid-section__header {
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .card-grid-section__header h2 {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.45rem;
+}
+
+/* short gold rule under section headings */
+.card-grid-section__header h2,
+.review-panel__header h2,
+.save-result header h2 {
+  position: relative;
+}
+
+.card-grid-section__header h2::after,
+.review-panel__header h2::after,
+.save-result header h2::after {
+  content: "";
+  display: block;
+  margin-top: 0.55rem;
+  width: 2.75rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    color-mix(in oklab, var(--accent) 0%, transparent)
+  );
 }
 
 .card-grid-section__header p {
   margin: 0;
   color: var(--muted);
-  max-width: 44rem;
+  max-width: 46rem;
+  line-height: 1.55;
 }
 
 .card-grid-section__grid {
@@ -253,12 +413,32 @@ button {
   gap: 1rem;
 }
 
+/* orchestrated staggered reveal */
 .card-grid-section__grid > .selectable-card {
-  animation: card-rise 260ms ease both;
+  animation: card-rise 320ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
+.card-grid-section__grid > .selectable-card:nth-child(1) { animation-delay: 20ms; }
+.card-grid-section__grid > .selectable-card:nth-child(2) { animation-delay: 55ms; }
+.card-grid-section__grid > .selectable-card:nth-child(3) { animation-delay: 90ms; }
+.card-grid-section__grid > .selectable-card:nth-child(4) { animation-delay: 125ms; }
+.card-grid-section__grid > .selectable-card:nth-child(5) { animation-delay: 160ms; }
+.card-grid-section__grid > .selectable-card:nth-child(6) { animation-delay: 195ms; }
+.card-grid-section__grid > .selectable-card:nth-child(7) { animation-delay: 230ms; }
+.card-grid-section__grid > .selectable-card:nth-child(8) { animation-delay: 265ms; }
+
+/* ------------------------------------------------------------- cards --- */
 
 .selectable-card {
   overflow: hidden;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.selectable-card:hover {
+  border-color: var(--border-strong);
 }
 
 .selectable-card__select,
@@ -277,23 +457,34 @@ button {
 .selectable-card__toggle {
   padding: 0.9rem 1.15rem 1rem;
   color: var(--accent);
-  border-top: 1px solid rgba(125, 161, 212, 0.12);
+  font-stretch: 80%;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  border-top: 1px solid var(--hairline);
 }
 
 .selectable-card.is-selected {
   border-color: var(--border-strong);
-  background: linear-gradient(180deg, rgba(28, 38, 53, 0.98), rgba(19, 27, 39, 0.95));
+  background: color-mix(in oklab, var(--action) 10%, var(--panel-strong));
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 var(--hairline),
+    inset 3px 0 0 var(--action);
 }
 
 .selectable-card h3 {
   margin-top: 0;
   margin-bottom: 0.45rem;
   font-size: 1.35rem;
+  color: var(--text);
 }
 
 .selectable-card p {
   margin: 0.3rem 0;
-  color: #d7e4f3;
+  color: var(--text);
+  line-height: 1.55;
 }
 
 .selectable-card__question {
@@ -307,6 +498,11 @@ button {
   align-items: center;
 }
 
+.character-card__heading h3 {
+  font-size: 1.35rem;
+  margin: 0 0 0.2rem;
+}
+
 .character-card__heading p,
 .character-card__best-for {
   color: var(--muted);
@@ -315,8 +511,8 @@ button {
 .character-art {
   display: block;
   object-fit: cover;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--text) 4%, transparent);
 }
 
 .character-art--placeholder {
@@ -326,11 +522,15 @@ button {
   border: 1px dashed var(--border);
 }
 
+/* gold ring complements the art's ornate frames */
 .character-card__token {
   width: 4.5rem;
   height: 4.5rem;
   border-radius: 999px;
-  border: 2px solid rgba(136, 180, 243, 0.32);
+  border: 2px solid color-mix(in oklab, var(--accent) 60%, transparent);
+  box-shadow:
+    inset 0 0 0 1px oklch(0 0 0 / 0.45),
+    0 2px 8px oklch(0 0 0 / 0.4);
 }
 
 .character-card__details {
@@ -345,10 +545,18 @@ button {
 .review-panel__avatar {
   width: 100%;
   min-height: 15rem;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 6px 18px oklch(0 0 0 / 0.4);
 }
 
 .character-card__detail-copy > * + * {
   margin-top: 1rem;
+}
+
+.character-card__detail-copy h4 {
+  font-size: 1.02rem;
+  margin-bottom: 0.4rem;
+  color: var(--accent-strong);
 }
 
 .character-card__appearance {
@@ -356,6 +564,15 @@ button {
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
+}
+
+.character-card__appearance > span {
+  font-stretch: 80%;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.74rem;
+  color: var(--muted);
 }
 
 .character-card__appearance-buttons {
@@ -367,34 +584,42 @@ button {
   margin-top: 0.25rem;
 }
 
+/* ----------------------------------------------------------- controls --- */
+
 .mini-toggle,
 .question-choice,
 .ghost-button,
 .primary-button,
 .secondary-button {
-  border-radius: 999px;
+  border-radius: 0.5rem;
   border: 1px solid var(--border);
   transition:
     transform 160ms ease,
     border-color 160ms ease,
-    background-color 160ms ease;
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .mini-toggle,
 .question-choice {
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in oklab, var(--text) 3%, transparent);
   color: var(--text);
 }
 
 .mini-toggle {
-  padding: 0.45rem 0.75rem;
+  padding: 0.45rem 0.8rem;
+  font-stretch: 90%;
+  font-weight: 600;
+  font-size: 0.86rem;
 }
 
 .mini-toggle.is-active,
 .question-choice.is-active {
   border-color: var(--border-strong);
-  background: rgba(136, 180, 243, 0.15);
+  background: color-mix(in oklab, var(--accent) 16%, transparent);
 }
+
+/* ----------------------------------------------------------- summary --- */
 
 .summary-panel {
   position: sticky;
@@ -407,7 +632,8 @@ button {
 
 .summary-panel__mobile summary {
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
+  font-stretch: 112%;
 }
 
 .summary-panel__content {
@@ -422,15 +648,15 @@ button {
 }
 
 .summary-panel__list dt {
-  color: var(--accent);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
 }
 
 .summary-panel__list dd {
-  margin: 0.22rem 0 0;
+  margin: 0.25rem 0 0;
+  color: var(--text);
 }
+
+/* ------------------------------------------------------------- review --- */
 
 .review-step {
   display: grid;
@@ -457,9 +683,13 @@ button {
 
 .review-chip {
   padding: 1rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   background: var(--panel-soft);
-  border: 1px solid rgba(125, 161, 212, 0.12);
+  border: 1px solid var(--hairline);
+}
+
+.review-chip h3 {
+  font-size: 1.05rem;
 }
 
 .field-block {
@@ -469,17 +699,32 @@ button {
 }
 
 .field-block span {
-  color: var(--accent);
+  font-size: 0.74rem;
 }
 
 .field-block input,
 .field-block textarea {
   width: 100%;
-  padding: 0.9rem 1rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(125, 161, 212, 0.2);
-  background: rgba(8, 13, 21, 0.72);
+  padding: 0.85rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-strong);
+  background: var(--field);
   color: var(--text);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.field-block input:focus,
+.field-block textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.field-block input::placeholder,
+.field-block textarea::placeholder {
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
 }
 
 .optional-question-panel {
@@ -497,7 +742,6 @@ button {
   gap: 0.3rem;
   padding: 0.9rem 1rem;
   text-align: left;
-  border-radius: 1rem;
 }
 
 .question-choice span {
@@ -507,8 +751,11 @@ button {
 .validation-list {
   margin-top: 1rem;
   padding-left: 1.25rem;
-  color: #efb4a8;
+  color: var(--danger);
+  line-height: 1.6;
 }
+
+/* ------------------------------------------------------------ buttons --- */
 
 .save-result__actions,
 .step-actions {
@@ -524,20 +771,40 @@ button {
 .ghost-button,
 .primary-button,
 .secondary-button {
-  padding: 0.8rem 1.15rem;
+  padding: 0.78rem 1.2rem;
+  font-weight: 600;
 }
 
 .primary-button {
-  background: linear-gradient(180deg, #88b4f3 0%, #5f8fda 100%);
-  border-color: transparent;
-  color: #091018;
+  background: linear-gradient(180deg, var(--action-strong), var(--action));
+  border-color: color-mix(in oklab, var(--action) 55%, black);
+  color: var(--on-action);
   font-weight: 700;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 22%, transparent);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--action-strong), white 8%),
+    var(--action-strong)
+  );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 24%, transparent),
+    0 6px 18px color-mix(in oklab, var(--action) 40%, transparent);
 }
 
 .secondary-button,
 .ghost-button {
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in oklab, var(--text) 3%, transparent);
   color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.secondary-button:hover:not(:disabled),
+.ghost-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 9%, transparent);
 }
 
 .save-result__message {
@@ -546,11 +813,11 @@ button {
 }
 
 .save-result__message.is-success {
-  color: #bed7a0;
+  color: var(--success);
 }
 
 .save-result__message.is-error {
-  color: #efb4a8;
+  color: var(--danger);
 }
 
 .save-result__preview {
@@ -558,10 +825,14 @@ button {
   padding: 1rem;
   max-height: 24rem;
   overflow: auto;
-  border-radius: 1rem;
-  background: rgba(7, 11, 18, 0.84);
-  border: 1px solid rgba(125, 161, 212, 0.14);
-  color: #d5e3f4;
+  border-radius: 0.5rem;
+  background: oklch(0.12 0.01 66 / 0.92);
+  border: 1px solid var(--hairline);
+  color: color-mix(in oklab, var(--accent-strong) 65%, var(--text));
+  font-family: "JetBrains Mono", "Cascadia Code", ui-monospace, "SFMono-Regular",
+    Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -581,21 +852,48 @@ button:hover:not(:disabled) {
 }
 
 button:disabled {
-  opacity: 0.52;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
+/* -------------------------------------------------------------- motion --- */
+
 @keyframes card-rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+.app-header__eyebrow,
+.app-header h1,
+.app-header__subtitle {
+  animation: card-rise 460ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.app-header h1 {
+  animation-delay: 70ms;
+}
+.app-header__subtitle {
+  animation-delay: 140ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------- responsive --- */
 
 @media (max-width: 1100px) {
   .progress-stepper,

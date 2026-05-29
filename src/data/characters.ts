@@ -1,6 +1,6 @@
 import type { CharacterAppearanceOption, CharacterCard } from "../types";
 
-const characterAssetRoot = "/assets/characters";
+const characterAssetRoot = `${import.meta.env.BASE_URL}assets/characters`;
 
 function appearanceSet(classSlug: string): CharacterAppearanceOption[] {
   return [

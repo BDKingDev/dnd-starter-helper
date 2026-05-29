@@ -6,6 +6,7 @@ defineProps<{
   hasEndpoint: boolean;
   isSubmitting: boolean;
   submitSuccess: boolean;
+  submitSuccessMessage: string;
   submitError: string;
   copySuccess: boolean;
 }>();
@@ -22,8 +23,8 @@ const emit = defineEmits<{
     <header>
       <h2>Save your result</h2>
       <p>
-        Your draft is already stored on this device. Use the buttons below to send,
-        download, or copy your character choices.
+        Your draft is already stored on this device. Send it to the DM sheet when
+        available, and keep the JSON download or copy option as a backup.
       </p>
     </header>
 
@@ -35,7 +36,7 @@ const emit = defineEmits<{
         :disabled="!payload || isSubmitting"
         @click="emit('submit')"
       >
-        {{ isSubmitting ? "Sending..." : "Send to the DM sheet" }}
+        {{ isSubmitting ? "Sending..." : "Send to DM sheet" }}
       </button>
       <button type="button" class="secondary-button" :disabled="!payload" @click="emit('download')">
         Download JSON
@@ -46,13 +47,13 @@ const emit = defineEmits<{
     </div>
 
     <p v-if="submitSuccess" class="save-result__message is-success">
-      Submission sent successfully.
+      {{ submitSuccessMessage }}
     </p>
     <p v-else-if="submitError" class="save-result__message is-error">
-      {{ submitError }} You can still download or copy the JSON and send it to the DM manually.
+      {{ submitError }} Download or copy the JSON and send it to the DM manually.
     </p>
     <p v-else-if="!hasEndpoint" class="save-result__message">
-      No online submission endpoint is configured. Download or copy the JSON and send it to the DM.
+      No online submission link is configured. Download or copy the JSON and send it to the DM.
     </p>
 
     <pre v-if="payload" class="save-result__preview">{{ JSON.stringify(payload, null, 2) }}</pre>

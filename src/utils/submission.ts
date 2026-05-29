@@ -9,6 +9,8 @@ import type {
 } from "../types";
 import { slugify } from "./slugify";
 
+export type SubmissionResult = "verified" | "opaque";
+
 export function flattenCharacterForSubmission(
   character: CharacterCard,
   appearance: CharacterAppearanceOption
@@ -52,7 +54,23 @@ export function buildSubmissionPayload(input: {
 export async function submitPayload(
   endpoint: string,
   payload: SubmissionPayload
-): Promise<void> {
+): Promise<SubmissionResult> {
+  if (isGoogleAppsScriptEndpoint(endpoint)) {
+    // Apps Script web apps do not provide a browser-readable CORS response for
+    // cross-origin fetches, so use a simple no-cors request and treat it as a
+    // fire-and-forget submission path.
+    await fetch(endpoint, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    return "opaque";
+  }
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -65,10 +83,26 @@ export async function submitPayload(
     const message = await response.text();
     throw new Error(message || `Request failed with status ${response.status}`);
   }
+
+  return "verified";
 }
 
 export function buildSubmissionFilename(playerName: string): string {
   const safeName = slugify(playerName) || "player";
   const date = new Date().toISOString().slice(0, 10);
   return `${safeName}-character-choice-${date}.json`;
+}
+
+function isGoogleAppsScriptEndpoint(endpoint: string): boolean {
+  try {
+    const url = new URL(endpoint);
+    return (
+      url.hostname === "script.google.com" ||
+      url.hostname.endsWith(".script.google.com") ||
+      url.hostname === "script.googleusercontent.com" ||
+      url.hostname.endsWith(".script.googleusercontent.com")
+    );
+  } catch {
+    return false;
+  }
 }

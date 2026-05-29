@@ -59,6 +59,7 @@ const draft = reactive<DraftState>(
 const currentStep = ref(0);
 const expandedCharacterId = ref<string | null>(draft.selectedCharacterId);
 const submitSuccess = ref(false);
+const submitSuccessMessage = ref("");
 const submitError = ref("");
 const copySuccess = ref(false);
 const isSubmitting = ref(false);
@@ -256,11 +257,19 @@ async function handleSubmit() {
 
   isSubmitting.value = true;
   submitSuccess.value = false;
+  submitSuccessMessage.value = "";
   submitError.value = "";
 
   try {
-    await submitPayload(import.meta.env.VITE_SUBMISSION_ENDPOINT, submissionPayload.value);
+    const result = await submitPayload(
+      import.meta.env.VITE_SUBMISSION_ENDPOINT,
+      submissionPayload.value
+    );
     submitSuccess.value = true;
+    submitSuccessMessage.value =
+      result === "opaque"
+        ? "Your submission was sent. This connection does not provide an instant confirmation, so if your DM does not see it in the sheet, use Download JSON or Copy JSON as a backup."
+        : "Submission sent successfully.";
     clearDraft();
   } catch (error) {
     submitError.value =
@@ -462,6 +471,7 @@ const canAdvance = computed(() => {
             :has-endpoint="hasEndpoint"
             :is-submitting="isSubmitting"
             :submit-success="submitSuccess"
+            :submit-success-message="submitSuccessMessage"
             :submit-error="submitError"
             :copy-success="copySuccess"
             @submit="handleSubmit"

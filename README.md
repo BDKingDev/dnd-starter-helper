@@ -36,7 +36,7 @@ This repo includes [deploy.yml](.github/workflows/deploy.yml).
 
 1. Push the repo to GitHub.
 2. In GitHub, enable GitHub Pages with **Build and deployment = GitHub Actions**.
-3. Optionally set repository variables:
+3. Optionally set repository configuration:
    - `VITE_BASE_PATH`
    - `VITE_SUBMISSION_ENDPOINT`
 
@@ -89,7 +89,7 @@ This repo includes [apps_script/Code.gs](apps_script/Code.gs) for an anonymous G
 6. Choose **Web app**.
 7. Set access to **Anyone**.
 8. Deploy and copy the Web App URL.
-9. Set that URL as `VITE_SUBMISSION_ENDPOINT` in `.env` or GitHub repository variables.
+9. Set that URL as `VITE_SUBMISSION_ENDPOINT` in `.env` or as a GitHub Actions secret.
 
 The script appends these columns:
 

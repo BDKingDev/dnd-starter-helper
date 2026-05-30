@@ -78,12 +78,6 @@ const emit = defineEmits<{
             <li v-for="item in card.funThingsToDo" :key="item">{{ item }}</li>
           </ul>
         </div>
-        <div>
-          <h4>Healing-focused add-ons</h4>
-          <ul>
-            <li v-for="item in card.healingFocusedAddOns" :key="item">{{ item }}</li>
-          </ul>
-        </div>
       </div>
     </div>
   </SelectableCard>

@@ -10,6 +10,9 @@ import type {
 import { slugify } from "./slugify";
 
 export type SubmissionResult = "verified" | "opaque";
+interface SubmissionNetworkPayload extends SubmissionPayload {
+  submissionToken?: string;
+}
 
 export function flattenCharacterForSubmission(
   character: CharacterCard,
@@ -53,8 +56,11 @@ export function buildSubmissionPayload(input: {
 
 export async function submitPayload(
   endpoint: string,
-  payload: SubmissionPayload
+  payload: SubmissionPayload,
+  submissionToken?: string
 ): Promise<SubmissionResult> {
+  const networkPayload = buildNetworkPayload(payload, submissionToken);
+
   if (isGoogleAppsScriptEndpoint(endpoint)) {
     // Apps Script web apps do not provide a browser-readable CORS response for
     // cross-origin fetches, so use a simple no-cors request and treat it as a
@@ -65,7 +71,7 @@ export async function submitPayload(
       headers: {
         "Content-Type": "text/plain;charset=utf-8"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(networkPayload)
     });
 
     return "opaque";
@@ -76,7 +82,7 @@ export async function submitPayload(
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(networkPayload)
   });
 
   if (!response.ok) {
@@ -105,4 +111,18 @@ function isGoogleAppsScriptEndpoint(endpoint: string): boolean {
   } catch {
     return false;
   }
+}
+
+function buildNetworkPayload(
+  payload: SubmissionPayload,
+  submissionToken?: string
+): SubmissionNetworkPayload {
+  if (!submissionToken?.trim()) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    submissionToken: submissionToken.trim()
+  };
 }

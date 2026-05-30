@@ -263,7 +263,8 @@ async function handleSubmit() {
   try {
     const result = await submitPayload(
       import.meta.env.VITE_SUBMISSION_ENDPOINT,
-      submissionPayload.value
+      submissionPayload.value,
+      import.meta.env.VITE_SUBMISSION_TOKEN
     );
     submitSuccess.value = true;
     submitSuccessMessage.value =

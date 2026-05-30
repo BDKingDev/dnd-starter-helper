@@ -38,6 +38,7 @@ jobs:
         env:
           VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
           VITE_SUBMISSION_ENDPOINT: ${{ secrets.VITE_SUBMISSION_ENDPOINT }}
+          VITE_SUBMISSION_TOKEN: ${{ secrets.VITE_SUBMISSION_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

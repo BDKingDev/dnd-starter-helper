@@ -20,11 +20,12 @@ function doPost(e) {
     sheet.appendRow([
       new Date(),
       sanitizedPayload.playerName,
-      sanitizedPayload.character.title,
+      sanitizedPayload.character.characterName || sanitizedPayload.character.title,
       sanitizedPayload.character.className,
       sanitizedPayload.adventuringDrive.title,
       sanitizedPayload.careAbout.title,
       sanitizedPayload.flaw.title,
+      formatOptionalQuestion_(sanitizedPayload.optionalQuestion),
       sanitizedPayload.optionalAnswer,
       JSON.stringify(sanitizedPayload)
     ]);
@@ -106,6 +107,7 @@ function validatePayload_(payload) {
   validateCard_(payload.flaw, 'flaw', {
     title: MAX_TITLE_LENGTH
   });
+  validateOptionalQuestion_(payload.optionalQuestion);
 }
 
 function validateCard_(card, fieldName, requiredFields) {
@@ -160,8 +162,34 @@ function buildStoredPayload_(payload) {
     adventuringDrive: payload.adventuringDrive,
     careAbout: payload.careAbout,
     flaw: payload.flaw,
+    optionalQuestion: payload.optionalQuestion || null,
     optionalAnswer: payload.optionalAnswer || ''
   };
+}
+
+function validateOptionalQuestion_(optionalQuestion) {
+  if (optionalQuestion === undefined || optionalQuestion === null) {
+    return;
+  }
+
+  if (
+    typeof optionalQuestion !== 'object' ||
+    Array.isArray(optionalQuestion)
+  ) {
+    throw new Error('optionalQuestion must be an object.');
+  }
+
+  validateRequiredString_(optionalQuestion.source, 'optionalQuestion.source', MAX_TITLE_LENGTH);
+  validateRequiredString_(optionalQuestion.title, 'optionalQuestion.title', MAX_TITLE_LENGTH);
+  validateRequiredString_(optionalQuestion.question, 'optionalQuestion.question', 500);
+}
+
+function formatOptionalQuestion_(optionalQuestion) {
+  if (!optionalQuestion) {
+    return '';
+  }
+
+  return optionalQuestion.title + ': ' + optionalQuestion.question;
 }
 
 function getRateLimitCacheKey_() {
@@ -183,6 +211,7 @@ function getSubmissionSheet_() {
       'adventuringDriveTitle',
       'careAboutTitle',
       'flawTitle',
+      'optionalQuestion',
       'optionalAnswer',
       'fullJsonPayload'
     ]);

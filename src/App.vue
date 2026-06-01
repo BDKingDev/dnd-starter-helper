@@ -39,6 +39,7 @@ const steps = [
 
 const defaultDraftState: DraftState = {
   playerName: "",
+  characterName: "",
   selectedCharacterId: null,
   selectedCharacterAppearanceId: null,
   selectedPresentationGender: "male",
@@ -149,6 +150,18 @@ const validationErrors = computed(() => {
   return errors;
 });
 
+const selectedOptionalQuestion = computed(() => {
+  if (!draft.selectedOptionalQuestionSource) {
+    return null;
+  }
+
+  return (
+    optionalChoices.value.find(
+      (choice) => choice.source === draft.selectedOptionalQuestionSource
+    ) ?? null
+  );
+});
+
 const submissionPayload = computed(() => {
   if (
     !selectedCharacter.value ||
@@ -163,11 +176,13 @@ const submissionPayload = computed(() => {
 
   return buildSubmissionPayload({
     playerName: draft.playerName,
+    characterName: draft.characterName,
     character: selectedCharacter.value,
     appearance: selectedAppearance.value,
     adventuringDrive: selectedAdventuringDrive.value,
     careAbout: selectedCareAbout.value,
     flaw: selectedFlaw.value,
+    optionalQuestion: selectedOptionalQuestion.value,
     optionalAnswer: draft.optionalAnswer
   });
 });
@@ -216,6 +231,7 @@ watch(
     if (!cards.some((card) => card.id === draft.selectedCharacterId)) {
       draft.selectedCharacterId = null;
       draft.selectedCharacterAppearanceId = null;
+      draft.characterName = "";
       expandedCharacterId.value = null;
     }
   },
@@ -249,6 +265,9 @@ function goBack() {
 }
 
 function chooseCharacter(characterId: string) {
+  if (draft.selectedCharacterId !== characterId) {
+    draft.characterName = "";
+  }
   draft.selectedCharacterId = characterId;
   expandedCharacterId.value = characterId;
 }
@@ -478,11 +497,13 @@ const canAdvance = computed(() => {
             :care-about="selectedCareAbout"
             :flaw="selectedFlaw"
             :player-name="draft.playerName"
+            :character-name="draft.characterName"
             :optional-choices="optionalChoices"
             :selected-optional-question-source="draft.selectedOptionalQuestionSource"
             :optional-answer="draft.optionalAnswer"
             :validation-errors="validationErrors"
             @update-player-name="draft.playerName = $event"
+            @update-character-name="draft.characterName = $event"
             @update-optional-question-source="chooseOptionalSource"
             @update-optional-answer="draft.optionalAnswer = $event"
           />

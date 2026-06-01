@@ -16,6 +16,7 @@ defineProps<{
   careAbout: CareAboutCard;
   flaw: FlawCard;
   playerName: string;
+  characterName: string;
   optionalChoices: OptionalQuestionChoice[];
   selectedOptionalQuestionSource: string | null;
   optionalAnswer: string;
@@ -24,6 +25,7 @@ defineProps<{
 
 const emit = defineEmits<{
   updatePlayerName: [value: string];
+  updateCharacterName: [value: string];
   updateOptionalQuestionSource: [value: string | null];
   updateOptionalAnswer: [value: string];
 }>();
@@ -70,6 +72,17 @@ const emit = defineEmits<{
         maxlength="80"
         placeholder="Enter your name"
         @input="emit('updatePlayerName', ($event.target as HTMLInputElement).value)"
+      />
+    </label>
+
+    <label class="field-block">
+      <span>Character name (Optional, defaults exist if you don't have a name idea)</span>
+      <input
+        :value="characterName"
+        type="text"
+        maxlength="80"
+        :placeholder="character.characterName"
+        @input="emit('updateCharacterName', ($event.target as HTMLInputElement).value)"
       />
     </label>
 

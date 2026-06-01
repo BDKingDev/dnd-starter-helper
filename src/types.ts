@@ -67,6 +67,7 @@ export type OptionalQuestionSource =
 
 export interface DraftState {
   playerName: string;
+  characterName: string;
   selectedCharacterId: string | null;
   selectedCharacterAppearanceId: string | null;
   selectedPresentationGender: CharacterAppearanceId;
@@ -84,6 +85,7 @@ export interface SubmissionPayload {
   adventuringDrive: AdventuringDriveCard;
   careAbout: CareAboutCard;
   flaw: FlawCard;
+  optionalQuestion: OptionalQuestionChoice | null;
   optionalAnswer: string;
 }
 

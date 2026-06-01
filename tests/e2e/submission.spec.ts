@@ -21,7 +21,7 @@ async function reachReviewWithName(
   playerName = "Bailey"
 ) {
   await chooseHappyPath(page);
-  await page.getByRole("textbox", { name: "Player name" }).fill(playerName);
+  await page.getByRole("textbox", { name: "Player name (Your name)" }).fill(playerName);
 }
 
 test.describe("submission flow", () => {
@@ -60,6 +60,37 @@ test.describe("submission flow", () => {
       expect(postedBody?.submissionToken).toBe("playwright-test-token");
     });
 
+    test("includes the selected optional question in the outbound request", async ({
+      page
+    }) => {
+      let postedBody: Record<string, unknown> | null = null;
+
+      await page.route(
+        "https://script.google.com/macros/s/playwright-test/exec",
+        async (route) => {
+          const postData = route.request().postData();
+          postedBody = postData ? JSON.parse(postData) : null;
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ success: true })
+          });
+        }
+      );
+
+      await reachReviewWithName(page, "Question Tester");
+      await page.getByRole("button", { name: /Protect the Vulnerable/ }).click();
+      await page.getByRole("textbox", { name: "Your answer" }).fill("Because they can't protect themselves.");
+      await page.getByRole("button", { name: "Send to DM sheet" }).click();
+
+      expect(postedBody?.optionalQuestion).toEqual({
+        source: "adventuringDrive",
+        title: "Protect the Vulnerable",
+        question: "Who were you unable to protect once?"
+      });
+      expect(postedBody?.optionalAnswer).toBe("Because they can't protect themselves.");
+    });
+
     test("shows the Apps Script success copy after an opaque submission", async ({
       page
     }) => {
@@ -89,6 +120,19 @@ test.describe("submission flow", () => {
     }) => {
       await reachReviewWithName(page, "Token Tester");
       await expect(page.getByText('"submissionToken"')).toHaveCount(0);
+    });
+
+    test("uses the optional character name override in the visible JSON preview", async ({
+      page
+    }) => {
+      await reachReviewWithName(page, "Name Tester");
+      await page
+        .getByRole("textbox", {
+          name: "Character name (Optional, defaults exist if you don't have a name idea)"
+        })
+        .fill("Ser Rowan");
+
+      await expect(page.getByText('"characterName": "Ser Rowan"')).toBeVisible();
     });
   });
 });

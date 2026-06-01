@@ -5,6 +5,7 @@ import type {
   CharacterCard,
   CharacterSubmissionCard,
   FlawCard,
+  OptionalQuestionChoice,
   SubmissionPayload
 } from "../types";
 import { slugify } from "./slugify";
@@ -16,13 +17,14 @@ interface SubmissionNetworkPayload extends SubmissionPayload {
 
 export function flattenCharacterForSubmission(
   character: CharacterCard,
-  appearance: CharacterAppearanceOption
+  appearance: CharacterAppearanceOption,
+  characterName?: string
 ): CharacterSubmissionCard {
   return {
     id: character.id,
     title: character.title,
     className: character.className,
-    characterName: character.characterName,
+    characterName: characterName?.trim() || character.characterName,
     role: character.role,
     bestFor: character.bestFor,
     atTheTable: character.atTheTable,
@@ -36,20 +38,27 @@ export function flattenCharacterForSubmission(
 
 export function buildSubmissionPayload(input: {
   playerName: string;
+  characterName: string;
   character: CharacterCard;
   appearance: CharacterAppearanceOption;
   adventuringDrive: AdventuringDriveCard;
   careAbout: CareAboutCard;
   flaw: FlawCard;
+  optionalQuestion: OptionalQuestionChoice | null;
   optionalAnswer: string;
 }): SubmissionPayload {
   return {
     playerName: input.playerName.trim(),
     submittedAt: new Date().toISOString(),
-    character: flattenCharacterForSubmission(input.character, input.appearance),
+    character: flattenCharacterForSubmission(
+      input.character,
+      input.appearance,
+      input.characterName
+    ),
     adventuringDrive: input.adventuringDrive,
     careAbout: input.careAbout,
     flaw: input.flaw,
+    optionalQuestion: input.optionalQuestion,
     optionalAnswer: input.optionalAnswer.trim()
   };
 }

@@ -63,7 +63,7 @@ const emit = defineEmits<{
     </div>
 
     <label class="field-block">
-      <span>Player name</span>
+      <span>Player name (Your name)</span>
       <input
         :value="playerName"
         type="text"

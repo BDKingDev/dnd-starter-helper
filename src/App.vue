@@ -64,8 +64,11 @@ const submitError = ref("");
 const copySuccess = ref(false);
 const isSubmitting = ref(false);
 
+const availableCharacterCards = computed(() =>
+  characterCards.filter((card) => card.className !== "Artificer")
+);
 const selectedCharacter = computed(
-  () => characterCards.find((card) => card.id === draft.selectedCharacterId) ?? null
+  () => availableCharacterCards.value.find((card) => card.id === draft.selectedCharacterId) ?? null
 );
 const selectedAppearance = computed(() => {
   if (!selectedCharacter.value) {
@@ -198,6 +201,22 @@ watch(
         )?.id ??
         character.appearanceOptions[0]?.id ??
         null;
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  availableCharacterCards,
+  (cards) => {
+    if (!draft.selectedCharacterId) {
+      return;
+    }
+
+    if (!cards.some((card) => card.id === draft.selectedCharacterId)) {
+      draft.selectedCharacterId = null;
+      draft.selectedCharacterAppearanceId = null;
+      expandedCharacterId.value = null;
     }
   },
   { immediate: true }
@@ -371,7 +390,7 @@ const canAdvance = computed(() => {
           description="Choose what you want to do during play. Expand any class to see the bigger portrait, what they do at the table, and some fun play ideas."
         >
           <CharacterCard
-            v-for="card in characterCards"
+            v-for="card in availableCharacterCards"
             :key="card.id"
             :card="card"
             :selected="draft.selectedCharacterId === card.id"

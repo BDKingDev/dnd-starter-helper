@@ -49,6 +49,11 @@ test.describe("selection flow", () => {
   });
 
   test.describe("character selection", () => {
+    test("does not show artificer as a selectable class", async ({ page }) => {
+      await page.getByRole("button", { name: "Next" }).click();
+      await expect(page.getByRole("heading", { name: "Artificer" })).toHaveCount(0);
+    });
+
     test("uses the global female toggle for selected class art", async ({ page }) => {
       await page.getByRole("button", { name: "Female" }).click();
       await page.getByRole("button", { name: "Next" }).click();
@@ -66,7 +71,7 @@ test.describe("selection flow", () => {
       await expect(page.getByText("Enter your player name.")).toBeVisible();
       await expect(page.getByRole("button", { name: "Download JSON" })).toBeDisabled();
 
-      await page.getByRole("textbox", { name: "Player name" }).fill("Bailey");
+      await page.getByRole("textbox", { name: "Player name (Your name)" }).fill("Bailey");
 
       await expect(page.getByRole("button", { name: "Download JSON" })).toBeEnabled();
     });
@@ -77,7 +82,7 @@ test.describe("selection flow", () => {
       await expect(page.getByText("Enter your player name.")).toBeVisible();
       await expect(page.getByRole("button", { name: "Copy JSON" })).toBeDisabled();
 
-      await page.getByRole("textbox", { name: "Player name" }).fill("Bailey");
+      await page.getByRole("textbox", { name: "Player name (Your name)" }).fill("Bailey");
 
       await expect(page.getByRole("button", { name: "Copy JSON" })).toBeEnabled();
     });

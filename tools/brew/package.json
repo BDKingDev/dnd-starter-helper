@@ -1,0 +1,10 @@
+{
+  "name": "moongate-brew",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Render markdown adventure docs to a PHB-styled PDF via local Chrome (no Puppeteer). Local images supported.",
+  "bin": { "brew": "brew.mjs" },
+  "scripts": { "brew": "node brew.mjs" },
+  "dependencies": { "markdown-it": "^14.1.0" }
+}
